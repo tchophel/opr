@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import CustomUser
 from django.core.validators import MinValueValidator
+from projects.models import Project
 
 class Budget(models.Model):
     BUDGET_HEADS = [
@@ -10,6 +11,7 @@ class Budget(models.Model):
         ('donation', 'Donation'),
     ]
     
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='budgets', null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='budgets')
     total_budget = models.DecimalField(
         max_digits=15, 

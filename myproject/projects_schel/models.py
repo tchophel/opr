@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import CustomUser
+from projects.models import Project
 
 class Activity(models.Model):
     STATUS_CHOICES = [
@@ -9,6 +10,7 @@ class Activity(models.Model):
         ('on_hold', 'On Hold'),
     ]
     activity = models.AutoField(primary_key=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='activities', null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     start_date = models.DateField()

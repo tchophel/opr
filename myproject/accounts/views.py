@@ -63,24 +63,15 @@ class ProjectReportView(ListView):
 
     def get_queryset(self):
         projects = Project.objects.prefetch_related(
-            Prefetch('activities', queryset=Activity.objects.order_by('start_date')),
-            Prefetch('budgets', queryset=Budget.objects.order_by('-created_at'))
+            'activities', 'budgets'
         ).order_by('-created_at')
 
         project_data = []
         for project in projects:
-            first_activity = project.activities.first()
-            first_budget = project.budgets.first()
-
             project_data.append({
-                'id': project.id,
-                'name': first_activity.name if first_activity else 'N/A',
-                'description': first_activity.comments if first_activity else 'N/A',
-                'budget_head': first_budget.get_budget_head_display() if first_budget else 'N/A',
-                'budget': first_budget.total_budget if first_budget else 'N/A',
-                'status': first_activity.get_status_display() if first_activity else 'N/A',
-                'start_date': first_activity.start_date if first_activity else 'N/A',
-                'end_date': first_activity.end_date if first_activity else 'N/A',
+                'project': project,
+                'activity': project.activities.first(),
+                'budget': project.budgets.first(),
             })
 
         return project_data
