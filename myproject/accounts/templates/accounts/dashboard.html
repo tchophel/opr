@@ -1,0 +1,216 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Dashboard</h1>
+    
+    <div class="row">
+        <!-- User Information Card -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">User Information</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><strong>Name:</strong> {{ user.name }}</p>
+                    <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
+                    <p class="card-text"><strong>Phone:</strong> {{ user.phone_number }}</p>
+                    <p class="card-text"><strong>Cluster:</strong> {{ user.get_cluster_display }}</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'projects_schel:activity_create' %}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Add New Activity
+                        </a>
+                        <a href="{% url 'budget:budget_create' %}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Add New Budget
+                        </a>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Section -->
+        <div class="col-md-8">
+            <!-- Combined Budget & Expense Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Budget & Expense Summary</h5>
+                    <div>
+                        <a href="{% url 'budget:budget_create' %}" class="btn btn-light btn-sm me-2">
+                            <i class="fas fa-plus"></i> Add Budget
+                        </a>
+                        <a href="{% url 'budget:expense_create' %}" class="btn btn-light btn-sm">
+                            <i class="fas fa-plus"></i> Add Expense
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Code/Description</th>
+                                    <th>Category</th>
+                                    <th>Amount (BTN)</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for budget in budgets %}
+                                <tr class="bg-light">
+                                    <td><span class="badge bg-info">Budget</span></td>
+                                    <td><strong>{{ budget.budget_code }}</strong></td>
+                                    <td>{{ budget.get_budget_head_display }}</td>
+                                    <td>{{ budget.total_budget }}</td>
+                                    <td>{{ budget.created_at|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <span class="badge bg-success">Active</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'budget:budget_update' budget.pk %}" 
+                                               class="btn btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'budget:budget_delete' budget.pk %}" 
+                                               class="btn btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% for expense in budget.expenses.all %}
+                                <tr>
+                                    <td><span class="badge bg-secondary">Expense</span></td>
+                                    <td>{{ expense.description|truncatechars:30 }}</td>
+                                    <td>{{ expense.expense_category }}</td>
+                                    <td>-{{ expense.amount }}</td>
+                                    <td>{{ expense.date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if expense.status == 'paid' %}bg-success
+                                            {% elif expense.status == 'pending' %}bg-warning
+                                            {% elif expense.status == 'rejected' %}bg-danger
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ expense.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'budget:expense_update' expense.pk %}" 
+                                               class="btn btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'budget:expense_delete' expense.pk %}" 
+                                               class="btn btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">No expenses for this budget</td>
+                                </tr>
+                                {% endfor %}
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">No budgets or expenses found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <td colspan="3"><strong>Total Summary</strong></td>
+                                    <td><strong>{{ total_budget_amount }} BTN</strong></td>
+                                    <td colspan="3"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"><strong>Total Expenses</strong></td>
+                                    <td><strong>-{{ total_expense_amount }} BTN</strong></td>
+                                    <td colspan="3"></td>
+                                </tr>
+                                <tr class="table-active">
+                                    <td colspan="3"><strong>Remaining Balance</strong></td>
+                                    <td><strong>{{ remaining_balance }} BTN</strong></td>
+                                    <td colspan="3"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <!-- Activities Section -->
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Your Activities</h5>
+                    <a href="{% url 'projects_schel:activity_create' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus"></i> Add Activity
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if activities %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Activity</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                    <th>Comments</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in activities %}
+                                <tr>
+                                    <td>{{ activity.name }}</td>
+                                    <td>{{ activity.start_date }}</td>
+                                    <td>{{ activity.end_date }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if activity.status == 'completed' %}bg-success
+                                            {% elif activity.status == 'in_progress' %}bg-primary
+                                            {% elif activity.status == 'on_hold' %}bg-warning
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ activity.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ activity.comments|truncatechars:30 }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'projects_schel:activity_update' activity.pk %}" 
+                                               class="btn btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'projects_schel:activity_delete' activity.pk %}" 
+                                               class="btn btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No activities found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        You don't have any activities yet. <a href="{% url 'projects_schel:activity_create' %}">Create your first activity</a>.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

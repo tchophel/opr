@@ -1,0 +1,70 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Risk Log</h2>
+        <a href="{% url 'budget:risk_log_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Risk
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>SL.No</th>
+                    <th>Risk</th>
+                    <th>Severity</th>
+                    <th>Probability</th>
+                    <th>Project</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for risk in risks %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ risk.risk }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if risk.severity == 'critical' %}bg-danger
+                            {% elif risk.severity == 'high' %}bg-warning
+                            {% elif risk.severity == 'medium' %}bg-info
+                            {% else %}bg-secondary{% endif %}">
+                            {{ risk.get_severity_display }}
+                        </span>
+                    </td>
+                    <td>{{ risk.get_probability_display }}</td>
+                    <td>{{ risk.project.project_name|default:"-" }}</td>
+                    <td>
+                        {% if risk.is_resolved %}
+                            <span class="badge bg-success">Resolved</span>
+                        {% else %}
+                            <span class="badge bg-danger">Open</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'budget:risk_log_update' risk.pk %}" 
+                               class="btn btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'budget:risk_log_delete' risk.pk %}" 
+                               class="btn btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No risks logged</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

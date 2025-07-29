@@ -1,0 +1,43 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Project Report</h2>
+    
+    <div class="table-responsive">
+            <table class="table table-bordered mt-4">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Project ID</th>
+                        <th>Project Name</th>
+                        <th>Description</th>
+                        <th>Budget Head</th>
+                        <th>Budget (BTN)</th>
+                        <th>Status</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in project_data %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.budget_head }}</td>
+                        <td>{{ item.budget }}</td>
+                        <td>{{ item.status }}</td>
+                        <td>{{ item.start_date }}</td>
+                        <td>{{ item.end_date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8">No projects available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+    </div>
+</div>
+{% endblock %}

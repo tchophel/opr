@@ -1,0 +1,52 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Your Budgets</h2>
+        <a href="{% url 'budget:budget_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Budget
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Budget Code</th>
+                    <th>Budget Head</th>
+                    <th>Total Amount (BTN)</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for budget in budgets %}
+                <tr>
+                    <td>{{ budget.budget_code }}</td>
+                    <td>{{ budget.get_budget_head_display }}</td>
+                    <td>{{ budget.total_budget }}</td>
+                    <td>{{ budget.created_at|date:"Y-m-d" }}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'budget:budget_update' budget.pk %}" 
+                               class="btn btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'budget:budget_delete' budget.pk %}" 
+                               class="btn btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No budgets found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My Projects</h2>
+    <a href="{% url 'projects:project_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Project
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Project Name</th>
+                <th>Budget Head</th>
+                <th>Budget</th>
+                <th>Status</th>
+                <th>Start Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <td>{{ project.project_id }}</td>
+                <td>
+                    <a href="{% url 'projects:project_detail' project.pk %}">
+                        {{ project.project_name }}
+                    </a>
+                </td>
+                <td>{{ project.get_budget_head_display }}</td>
+                <td>Nu: {{ project.budget }}</td>
+                <td>
+                    <span class="badge 
+                        {% if project.status == 'completed' %}bg-success
+                        {% elif project.status == 'ongoing' %}bg-primary
+                        {% elif project.status == 'on_hold' %}bg-warning
+                        {% elif project.status == 'cancelled' %}bg-danger
+                        {% else %}bg-secondary{% endif %}">
+                        {{ project.get_status_display }}
+                    </span>
+                </td>
+                <td>{{ project.start_date|date:"Y-m-d" }}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'projects:project_update' project.pk %}" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'projects:project_delete' project.pk %}" 
+                           class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">No projects found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
